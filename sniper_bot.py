@@ -17,7 +17,7 @@ def scalping_menu():
     keyboard = [
         [InlineKeyboardButton("5 segundos", callback_data="op_5s")],
         [InlineKeyboardButton("10 segundos", callback_data="op_10s")],
-        [InlineKeyboardButton("⬅ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -27,7 +27,7 @@ def minutos_menu():
         [InlineKeyboardButton("1 minuto", callback_data="op_1m")],
         [InlineKeyboardButton("3 minutos", callback_data="op_3m")],
         [InlineKeyboardButton("5 minutos", callback_data="op_5m")],
-        [InlineKeyboardButton("⬅ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
