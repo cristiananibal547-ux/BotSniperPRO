@@ -1,11 +1,6 @@
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    CallbackQueryHandler,
-    ContextTypes,
-)
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
@@ -22,7 +17,7 @@ def scalping_menu():
     keyboard = [
         [InlineKeyboardButton("5 segundos", callback_data="op_5s")],
         [InlineKeyboardButton("10 segundos", callback_data="op_10s")],
-        [InlineKeyboardButton("⬅ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -32,50 +27,41 @@ def minutos_menu():
         [InlineKeyboardButton("1 minuto", callback_data="op_1m")],
         [InlineKeyboardButton("3 minutos", callback_data="op_3m")],
         [InlineKeyboardButton("5 minutos", callback_data="op_5m")],
-        [InlineKeyboardButton("⬅ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 # ===== Comando /start =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🚀 Bienvenido a *Bot Sniper PRO*.\nSeleccioná el modo de operación:",
+        "🤖 Bienvenido a *Bot Sniper PRO*.\nSeleccioná el modo de operación:",
         reply_markup=main_menu(),
         parse_mode="Markdown"
     )
 
 # ===== Manejo de botones =====
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     if query.data == "scalping":
-        await query.edit_message_text(
-            "⚡ Modo Scalping - elegí el tiempo:",
-            reply_markup=scalping_menu()
-        )
+        await query.edit_message_text("Seleccioná el tiempo de scalping:", reply_markup=scalping_menu())
     elif query.data == "minutos":
-        await query.edit_message_text(
-            "⏱ Operaciones en minutos - elegí el tiempo:",
-            reply_markup=minutos_menu()
-        )
+        await query.edit_message_text("Seleccioná el tiempo en minutos:", reply_markup=minutos_menu())
     elif query.data.startswith("op_"):
-        await query.edit_message_text(
-            f"✅ Operación seleccionada: {query.data.replace('op_', '')}"
-        )
+        await query.edit_message_text(f"✅ Opción seleccionada: {query.data}")
     elif query.data == "volver_main":
-        await query.edit_message_text(
-            "🔙 Menú principal:",
-            reply_markup=main_menu()
-        )
+        await query.edit_message_text("📋 Menú principal:", reply_markup=main_menu())
 
 # ===== Función principal =====
 def main():
-    app = Application.builder().token(TOKEN).concurrent_updates(True).build()
+    app = Application.builder().token(TOKEN).build()
 
+    # Handlers
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button))
+    app.add_handler(CallbackQueryHandler(button_handler))
 
+    print("🤖 Bot corriendo en modo sniper 24/7...")
     app.run_polling()
 
 if __name__ == "__main__":
