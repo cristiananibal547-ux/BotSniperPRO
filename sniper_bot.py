@@ -1,11 +1,6 @@
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    CallbackQueryHandler,
-    ContextTypes,
-)
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
@@ -45,36 +40,25 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ===== Manejo de botones =====
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     if query.data == "scalping":
-        await query.edit_message_text(
-            "⚡ Modo Scalping - elegí el tiempo:",
-            reply_markup=scalping_menu()
-        )
+        await query.edit_message_text("Seleccioná el tiempo de scalping:", reply_markup=scalping_menu())
     elif query.data == "minutos":
-        await query.edit_message_text(
-            "⏱ Operaciones en minutos - elegí el tiempo:",
-            reply_markup=minutos_menu()
-        )
+        await query.edit_message_text("Seleccioná el tiempo en minutos:", reply_markup=minutos_menu())
     elif query.data.startswith("op_"):
-        await query.edit_message_text(
-            f"✅ Operación seleccionada: {query.data.replace('op_', '')}"
-        )
+        await query.edit_message_text(f"✅ Opción seleccionada: {query.data}")
     elif query.data == "volver_main":
-        await query.edit_message_text(
-            "🔙 Menú principal:",
-            reply_markup=main_menu()
-        )
+        await query.edit_message_text("🚀 Menú principal:", reply_markup=main_menu())
 
 # ===== Función principal =====
 def main():
-    app = Application.builder().token(TOKEN).concurrent_updates(True).build()
+    app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button))
+    app.add_handler(CallbackQueryHandler(button_handler))
 
     app.run_polling()
 
