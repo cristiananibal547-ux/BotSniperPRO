@@ -17,7 +17,7 @@ def scalping_menu():
     keyboard = [
         [InlineKeyboardButton("5 segundos", callback_data="op_5s")],
         [InlineKeyboardButton("10 segundos", callback_data="op_10s")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅ Volver", callback_data="volver_main")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -27,7 +27,7 @@ def minutos_menu():
         [InlineKeyboardButton("1 minuto", callback_data="op_1m")],
         [InlineKeyboardButton("3 minutos", callback_data="op_3m")],
         [InlineKeyboardButton("5 minutos", callback_data="op_5m")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅ Volver", callback_data="volver_main")],
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -51,11 +51,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data.startswith("op_"):
         await query.edit_message_text(f"✅ Opción seleccionada: {query.data}")
     elif query.data == "volver_main":
-<<<<<<< HEAD
         await query.edit_message_text("📋 Menú principal:", reply_markup=main_menu())
-=======
-        await query.edit_message_text("🚀 Menú principal:", reply_markup=main_menu())
->>>>>>> f7c52826c717b7d46200c728c7b695a450de4e44
 
 # ===== Función principal =====
 def main():
