@@ -51,7 +51,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data.startswith("op_"):
         await query.edit_message_text(f"✅ Opción seleccionada: {query.data}")
     elif query.data == "volver_main":
+<<<<<<< HEAD
         await query.edit_message_text("📋 Menú principal:", reply_markup=main_menu())
+=======
+        await query.edit_message_text("🚀 Menú principal:", reply_markup=main_menu())
+>>>>>>> f7c52826c717b7d46200c728c7b695a450de4e44
 
 # ===== Función principal =====
 def main():
