@@ -2,13 +2,16 @@ import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+# ==========================
+# Configuración del Token
+# ==========================
+TELEGRAM_TOKEN = "7509597620:AAHjHjGdDib6-TXkpac9JzAFeW8hS5cP1PQ"
 
 # ===== Menú principal =====
 def main_menu():
     keyboard = [
         [InlineKeyboardButton("⚡ Scalping (segundos)", callback_data="scalping")],
-        [InlineKeyboardButton("⏱ Operaciones en minutos", callback_data="minutos")],
+        [InlineKeyboardButton("⏱ Operaciones en minutos", callback_data="minutos")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -17,7 +20,7 @@ def scalping_menu():
     keyboard = [
         [InlineKeyboardButton("5 segundos", callback_data="op_5s")],
         [InlineKeyboardButton("10 segundos", callback_data="op_10s")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -27,14 +30,14 @@ def minutos_menu():
         [InlineKeyboardButton("1 minuto", callback_data="op_1m")],
         [InlineKeyboardButton("3 minutos", callback_data="op_3m")],
         [InlineKeyboardButton("5 minutos", callback_data="op_5m")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")],
+        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
 # ===== Comando /start =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 Bienvenido a *Bot Sniper PRO*.\nSeleccioná el modo de operación:",
+        "🚀 Bienvenido a *Bot Sniper PRO*.\nSeleccioná el modo de operación:",
         reply_markup=main_menu(),
         parse_mode="Markdown"
     )
@@ -55,13 +58,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ===== Función principal =====
 def main():
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(TELEGRAM_TOKEN).build()
 
     # Handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    print("🚀 Bot corriendo en modo sniper 24/7...")
+    print("🤖 Bot corriendo en modo sniper 24/7...")
     app.run_polling()
 
 if __name__ == "__main__":
