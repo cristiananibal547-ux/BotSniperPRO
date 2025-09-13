@@ -1,4 +1,7 @@
 python-telegram-bot==20.3
-pandas
+anyio==4.0.0
+tzdata
+pytz
 requests
-apscheduler
+pandas
+numpy
