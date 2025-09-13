@@ -1,67 +1,47 @@
 import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+import logging
+from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from api_yahoo import precio_yahoo
+from api_news import ultimas_noticias
 
-# ==========================
-# Configuración del Token
-# ==========================
-TELEGRAM_TOKEN = "7509597620:AAHjHjGdDib6-TXkpac9JzAFeW8hS5cP1PQ"
+# === Configuración ===
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
-# ===== Menú principal =====
-def main_menu():
-    keyboard = [
-        [InlineKeyboardButton("⚡ Scalping (segundos)", callback_data="scalping")],
-        [InlineKeyboardButton("⏱ Operaciones en minutos", callback_data="minutos")]
-    ]
-    return InlineKeyboardMarkup(keyboard)
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
 
-# ===== Menú scalping =====
-def scalping_menu():
-    keyboard = [
-        [InlineKeyboardButton("5 segundos", callback_data="op_5s")],
-        [InlineKeyboardButton("10 segundos", callback_data="op_10s")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")]
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-# ===== Menú minutos =====
-def minutos_menu():
-    keyboard = [
-        [InlineKeyboardButton("1 minuto", callback_data="op_1m")],
-        [InlineKeyboardButton("3 minutos", callback_data="op_3m")],
-        [InlineKeyboardButton("5 minutos", callback_data="op_5m")],
-        [InlineKeyboardButton("⬅️ Volver", callback_data="volver_main")]
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-# ===== Comando /start =====
+# === Comando /start ===
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🚀 Bienvenido a *Bot Sniper PRO*.\nSeleccioná el modo de operación:",
-        reply_markup=main_menu(),
-        parse_mode="Markdown"
-    )
+    await update.message.reply_text("🚀 BotSniperPRO activo 24/7. Usá /precio para ver un activo o /noticias para últimas noticias.")
 
-# ===== Manejo de botones =====
+# === Comando /precio ===
+async def precio(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.args:
+        await update.message.reply_text("📌 Uso: /precio EURUSD=X")
+        return
+    symbol = context.args[0]
+    resultado = precio_yahoo(symbol)
+    await update.message.reply_text(f"💹 Precio de {symbol}: {resultado}")
+
+# === Comando /noticias ===
+async def noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    resultado = ultimas_noticias()
+    await update.message.reply_text(f"📰 Noticias recientes:\n{resultado}")
+
+# === Botón handler (si lo necesitás después) ===
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
+    await update.callback_query.answer("Botón presionado 🚀")
 
-    if query.data == "scalping":
-        await query.edit_message_text("Seleccioná el tiempo de scalping:", reply_markup=scalping_menu())
-    elif query.data == "minutos":
-        await query.edit_message_text("Seleccioná el tiempo en minutos:", reply_markup=minutos_menu())
-    elif query.data.startswith("op_"):
-        await query.edit_message_text(f"✅ Opción seleccionada: {query.data}")
-    elif query.data == "volver_main":
-        await query.edit_message_text("📋 Menú principal:", reply_markup=main_menu())
-
-# ===== Función principal =====
+# === Main ===
 def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
 
-    # Handlers
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("precio", precio))
+    app.add_handler(CommandHandler("noticias", noticias))
     app.add_handler(CallbackQueryHandler(button_handler))
 
     print("🤖 Bot corriendo en modo sniper 24/7...")
