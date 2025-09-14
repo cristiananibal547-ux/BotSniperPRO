@@ -1,70 +1,63 @@
+import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 from menu_divisas import obtener_menu_divisas
 from estrategias import analizar_senal
-from api_yahoo import precio_yahoo
-from api_news import ultimas_noticias
-import os
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+# Configuración básica
+logging.basicConfig(level=logging.INFO)
+TOKEN = "7509597620:AAHjHjGdDib6-TXkpac9JzAFeW8hS5cP1PQ"
 
-# === Start ===
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# 🎯 MENÚ PRINCIPAL
+def main_menu():
     keyboard = [
-        [InlineKeyboardButton("Monedas", callback_data="menu_monedas"),
-         InlineKeyboardButton("Criptomonedas", callback_data="menu_cripto")],
-        [InlineKeyboardButton("Acciones", callback_data="menu_acciones"),
-         InlineKeyboardButton("Índices", callback_data="menu_indices")],
-        [InlineKeyboardButton("Scalping 5s/10s ⚡", callback_data="menu_scalping")],
-        [InlineKeyboardButton("📢 Noticias", callback_data="menu_news")]
+        [InlineKeyboardButton("💱 Divisas", callback_data="menu_monedas"),
+         InlineKeyboardButton("₿ Criptos", callback_data="menu_cripto")],
+        [InlineKeyboardButton("📈 Acciones", callback_data="menu_acciones"),
+         InlineKeyboardButton("🌍 Índices", callback_data="menu_indices")],
+        [InlineKeyboardButton("⚡ Scalping", callback_data="menu_scalping")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("👋 Bienvenido a **Sniper PRO Bot** ⚔️📊\n"
-                                    "Analizo +26 parámetros técnicos y noticias 24/7 🚀",
-                                    reply_markup=reply_markup)
+    return InlineKeyboardMarkup(keyboard)
 
-# === Precios ===
-async def precio(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not context.args:
-        await update.message.reply_text("⚠️ Uso: /precio EURUSD=X")
-        return
-    symbol = context.args[0]
-    resultado = precio_yahoo(symbol)
-    await update.message.reply_text(f"📊 Precio de {symbol}: {resultado}")
+# 🚀 Mensaje de bienvenida
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user.first_name
+    welcome_message = (
+        f"🎯 Bienvenido {user} a **SNIPER PRO BOT** 🔥\n\n"
+        "📊 El asistente financiero diseñado para dar **señales claras y fáciles de operar** en trading.\n"
+        "⚡ Podés elegir activos (divisas, criptos, acciones, índices) o el modo **Scalping Sniper 5s / 10s**.\n\n"
+        "✅ Cualquiera puede usarlo, incluso sin experiencia. "
+        "El objetivo es que todos puedan ganar de forma simple 💵.\n\n"
+        "👉 Elegí una opción del menú:"
+    )
+    await update.message.reply_text(welcome_message, reply_markup=main_menu())
 
-# === Noticias ===
-async def noticias(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    resultado = ultimas_noticias()
-    await update.message.reply_text(f"📰 Noticias recientes:\n{resultado}")
-
-# === Botón handler ===
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# 🎯 Callback para manejar menús y señales
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    data = query.data
 
-    if data.startswith("menu_"):
-        menu = obtener_menu_divisas(data)
-        await query.edit_message_text("📌 Elegí una opción:", reply_markup=menu)
+    if query.data.startswith("menu_"):
+        menu = query.data
+        await query.edit_message_text(
+            text="📋 Elegí un activo:",
+            reply_markup=obtener_menu_divisas(menu)
+        )
 
-    elif data.startswith("scalping_"):
-        tiempo = data.split("_")[1]
-        resultado = analizar_senal("AUD/CHF", tiempo)  # ejemplo
-        await query.edit_message_text(resultado)
+    elif query.data.startswith("scalping_"):
+        par = query.data.replace("scalping_", "")
+        tiempo = "Scalping 5s" if par == "5s" else "Scalping 10s" if par == "10s" else "1 min"
+        senal = analizar_senal(par, tiempo)
+        await query.edit_message_text(senal, reply_markup=main_menu())
 
-    elif data == "menu_news":
-        resultado = ultimas_noticias()
-        await query.edit_message_text(f"📰 Noticias recientes:\n{resultado}")
+    elif query.data == "menu_main":
+        await query.edit_message_text("📋 Menú principal:", reply_markup=main_menu())
 
-# === Main ===
+# 🚀 Lanzar bot
 def main():
-    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("precio", precio))
-    app.add_handler(CommandHandler("noticias", noticias))
-    app.add_handler(CallbackQueryHandler(button_handler))
-
-    print("🤖 Sniper PRO corriendo 24/7 en modo sniper...")
+    app.add_handler(CallbackQueryHandler(button))
     app.run_polling()
 
 if __name__ == "__main__":
