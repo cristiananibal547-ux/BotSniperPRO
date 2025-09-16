@@ -1,16 +1,25 @@
 import requests
 import os
 
-API_KEY_NEWS = os.getenv("NEWS_API_KEY")
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
-def ultimas_noticias():
+def obtener_noticias(query="trading"):
+    url = f"https://newsapi.org/v2/everything?q={query}&language=es&sortBy=publishedAt&apiKey={NEWS_API_KEY}"
     try:
-        url = f"https://newsapi.org/v2/top-headlines?language=es&apiKey={API_KEY_NEWS}"
-        r = requests.get(url)
-        data = r.json()
-        if "articles" not in data:
-            return "No se encontraron noticias."
-        titulos = [art["title"] for art in data["articles"][:5]]
-        return "\n".join(titulos)
+        response = requests.get(url)
+        data = response.json()
+
+        if data.get("status") != "ok":
+            return f"Error en la API de noticias: {data.get('message', 'Desconocido')}"
+
+        articulos = data.get("articles", [])[:5]  # Trae solo las 5 últimas noticias
+        if not articulos:
+            return "No se encontraron noticias recientes."
+
+        resultado = "📰 Últimas Noticias:\n\n"
+        for art in articulos:
+            resultado += f"- {art['title']} ({art['source']['name']})\n"
+
+        return resultado
     except Exception as e:
         return f"Error obteniendo noticias: {e}"
