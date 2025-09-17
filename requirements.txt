@@ -8,4 +8,8 @@ flask==3.0.3
 gunicorn==21.2.0
 schedule==1.2.0
 beautifulsoup4==4.12.2
+<<<<<<< HEAD
 lxml==4.9.3
+=======
+lxml==4.9.3
+>>>>>>> 5cb09d6670cc121c546b7051017d4bc256c93062
